@@ -31,6 +31,16 @@ function range( first = 0, last = Infinity, step = 1 )
     */
 }
 
+/*
+ * Non-lazy version of map, wich will always return an array, not an iterator.
+ * Can be used, if the function has side effects and needs to be execured
+ * immediately, e.g. do something with a set of dom nodes.
+ */
+function forEach( f, iterable )
+{
+    return [...map( f, iterable )];
+}
+
 function map( f, iterable )
 {
     return {
