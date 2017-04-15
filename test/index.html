@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test page</title>
+</head>
+<!-- TODO: Write proper testscripts!!! -->
+<body>
+    <h1>Iterators</h1>
+    <h2>map</h2>
+    <h2>filter</h2>
+    <h2>foldL/foldR</h2>
+
+<script src="../src/main.js"></script>
+<script>
+    // Setup test environment
+    const a = range( 1, 10 )
+    ,     a_iter = a[Symbol.iterator]()
+    ,     b = map( x => x+1, a )
+    ,     b_iter = b[Symbol.iterator]()
+    ,     c = filter( x => x % 2 === 1, b )
+    ,     c_iter = c[Symbol.iterator]()
+    ;
+    for(let i of a)
+        console.log(i);
+
+    console.log('---')
+    for(let i of a)
+        console.log(i);
+
+    console.log('---')
+    for(let i of b)
+        console.log(i);
+
+    console.log('---')
+    for(let i of b)
+        console.log(i);
+
+    console.log('---')
+    for(let i of c)
+        console.log(i);
+
+</script>
+</body>
+</html>
