@@ -8,6 +8,19 @@ function range( first = 0, last = Infinity, step = 1 )
 {
     return { [Symbol.iterator]: iterate }
 
+    function* iterate()
+    {
+        let n = first;
+        while( n <= last ) {
+            yield n;
+            n += step;
+        }
+    }
+
+    /* ATTENTION
+     * Tail calls in generator functions will not be optimised, so infinite
+     * recusion is not a good idea.
+     * => Using good old, ugly loops instead :-(
     function* iterate( f = first, l = last, s = step ) 
     {
         if( f <= l ) {
@@ -15,6 +28,7 @@ function range( first = 0, last = Infinity, step = 1 )
             yield *iterate( f+s )
         }
     }
+    */
 }
 
 function map( f, iterable )
