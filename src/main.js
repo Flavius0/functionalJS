@@ -41,6 +41,10 @@ function forEach( f, iterable )
     return [...map( f, iterable )];
 }
 
+/*
+ * Return an iterater over an iterable object, wich will apply `f` on the
+ * element delivered from the original `iterable.next` on each `next` call.
+ */
 function map( f, iterable )
 {
     return {
@@ -57,6 +61,13 @@ function map( f, iterable )
     };
 }
 
+/*
+ * Filter an iterable and return an iterable object.
+ *
+ * ATTENTION (could this be fixed?):
+ * In case of infinite iterables, this can well lead to an endless recursion, if
+ * the filter is false for every following element
+ */
 function filter( f, iterable )
 {
     return {
