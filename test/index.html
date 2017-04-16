@@ -15,31 +15,12 @@
 <script>
     // Setup test environment
     const a = range( 1, 10 )
-    ,     a_iter = a[Symbol.iterator]()
-    ,     b = map( x => x+1, a )
-    ,     b_iter = b[Symbol.iterator]()
-    ,     c = filter( x => x % 2 === 1, b )
-    ,     c_iter = c[Symbol.iterator]()
+    ,     b = map(t => t*10, filter(t => t %2 === 0, a))
+    ,     c = tail( b )
     ;
-    for(let i of a)
-        console.log(i);
-
-    console.log('---')
-    for(let i of a)
-        console.log(i);
-
-    console.log('---')
-    for(let i of b)
-        console.log(i);
-
-    console.log('---')
-    for(let i of b)
-        console.log(i);
-
-    console.log('---')
-    for(let i of c)
-        console.log(i);
-
+    console.log([...c])
+    console.log(foldL((x,y) => x+y, 0, c))
+    console.log(foldR((y,x) => x+y, 0, c))
 </script>
 </body>
 </html>

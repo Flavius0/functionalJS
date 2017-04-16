@@ -1,8 +1,53 @@
+/*
+ * Functional Javascript
+ *
+ * Note: iterator[Symbol.iterator]() === iterator
+ * => This allows the functions to work on an iterable as well as directly on an
+ * iterator
+ * 
+ *
+ *  TODO:
+ *   - currying
+ */
 
-// TODO:
-//  - foldL/foldR
-//  - currying
-//  - function composition
+function comp( f, g )
+{
+    return (...args) =>  f(g(...args));
+}
+
+function head( iter )
+{
+    if( !iter )
+        throw new Error('Iterable is not defined!');
+
+    const tmp = iter[Symbol.iterator]()
+    ,     val = tmp.next()
+    ;
+    if( val.done )
+        throw new Error( 'Iterable is empty' )
+    return val.value;
+}
+
+function tail( iter )
+{
+    if( !iter )
+        throw new Error('Iterable is not defined!');
+
+    const tmp = iter[Symbol.iterator]()
+    ,     val = tmp.next()
+    ;
+    if( val.done )
+        throw new Error( 'Iterable is empty' )
+
+    return { 
+        [Symbol.iterator]: () => {
+            const i = iter[Symbol.iterator]();
+            i.next();
+            return { next: i.next };
+        }
+    };
+}
+
 
 function range( first = 0, last = Infinity, step = 1 )
 {
@@ -36,23 +81,23 @@ function range( first = 0, last = Infinity, step = 1 )
  * Can be used, if the function has side effects and needs to be execured
  * immediately, e.g. do something with a set of dom nodes.
  */
-function forEach( f, iterable )
+function forEach( f, iter )
 {
-    return [...map( f, iterable )];
+    return [...map( f, iter )];
 }
 
 /*
  * Return an iterater over an iterable object, wich will apply `f` on the
  * element delivered from the original `iterable.next` on each `next` call.
  */
-function map( f, iterable )
+function map( f, iter )
 {
     return {
         [Symbol.iterator]: () => {
-            const iter = iterable[Symbol.iterator]();
+            const tmp = iter[Symbol.iterator]();
             return { 
                 next: (...args) => {
-                    const v = iter.next( ...args );
+                    const v = tmp.next( ...args );
                     return v.done ? v 
                                   : { value: f( v.value ), done: false }
                 }
@@ -68,12 +113,12 @@ function map( f, iterable )
  * In case of infinite iterables, this can well lead to an endless recursion, if
  * the filter is false for every following element
  */
-function filter( f, iterable )
+function filter( f, iter )
 {
     return {
         [Symbol.iterator]: () => {
-            const iter = iterable[Symbol.iterator]();
-            return { next: gen_next( iter )};
+            const tmp = iter[Symbol.iterator]();
+            return { next: gen_next( tmp )};
         }
     }
 
@@ -91,13 +136,25 @@ function filter( f, iterable )
     }
 }
 
-function foldL() 
+function foldL(f, acc, iter) 
 {
-    throw "Implement me!";
+    const tmp = iter[Symbol.iterator]()
+    ,     val = tmp.next()
+    ;
+    if( val.done )
+        return acc;
+    else
+        return foldL( f, f( acc, head( iter )), tail( iter )); 
 }
 
-function foldR() 
+function foldR( f, acc, iter ) 
 {
-    throw "Implement me!";
+    const tmp = iter[Symbol.iterator]()
+    ,     val = tmp.next()
+    ;
+    if( val.done )
+        return acc;
+    else
+        return f( head( iter ), foldR( f, acc, tail( iter )));
 }
 
