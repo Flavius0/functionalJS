@@ -58,6 +58,23 @@ export function o( f, g )
 }
 
 /**
+ * Bind parameter to a function and return a function
+ *
+ * @param {function} f 
+ * @param {object} oThis
+ * @param {any} ...args
+ */
+function bindF(f, oThis, ...args)
+{
+    if( f.bind )
+        return f.bind( oThis, ...args );
+    else 
+        return ( ...other ) => {
+            f.call( oThis, ...args, ...other );
+        };
+}
+
+/**
  * Get the first element from an iterable object
  *
  * @param {object} iter - Iterable object
