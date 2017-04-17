@@ -10,48 +10,17 @@
  *   - currying
  */
 
-function comp( f, g )
+/**
+ * Construct a maybe infinite iterator.
+ *
+ * @param {number} first - start
+ * @param {number} last - end
+ * @param {number} step - step width
+ * @return {object} iterable object
+ */
+export function range( first = 0, last = Infinity, step = 1 )
 {
-    return (...args) =>  f(g(...args));
-}
-
-function head( iter )
-{
-    if( !iter )
-        throw new Error('Iterable is not defined!');
-
-    const tmp = iter[Symbol.iterator]()
-    ,     val = tmp.next()
-    ;
-    if( val.done )
-        throw new Error( 'Iterable is empty' )
-    return val.value;
-}
-
-function tail( iter )
-{
-    if( !iter )
-        throw new Error('Iterable is not defined!');
-
-    const tmp = iter[Symbol.iterator]()
-    ,     val = tmp.next()
-    ;
-    if( val.done )
-        throw new Error( 'Iterable is empty' )
-
-    return { 
-        [Symbol.iterator]: () => {
-            const i = iter[Symbol.iterator]();
-            i.next();
-            return { next: i.next };
-        }
-    };
-}
-
-
-function range( first = 0, last = Infinity, step = 1 )
-{
-    return { [Symbol.iterator]: iterate }
+    return { [Symbol.iterator]: iterate };
 
     function* iterate()
     {
@@ -76,21 +45,86 @@ function range( first = 0, last = Infinity, step = 1 )
     */
 }
 
-/*
+/**
+ * Function composition
+ *
+ * @param {function} f 
+ * @param {function} g 
+ * @return {function} composition of f and g
+ */
+export function o( f, g )
+{
+    return (...args) =>  f( g( ...args ));
+}
+
+/**
+ * Get the first element from an iterable object
+ *
+ * @param {object} iter - Iterable object
+ * @return {A} First element ob iter
+ */
+export function head( iter )
+{
+    if( !iter )
+        throw new Error('Iterable is not defined!');
+
+    const tmp = iter[Symbol.iterator]()
+    ,     val = tmp.next()
+    ;
+    if( val.done )
+        throw new Error( 'Iterable is empty' );
+    return val.value;
+}
+
+/**
+ * Get an iterator over all but the first element of an iterable object
+ *
+ * @param {object} iter - Iterable object
+ * @return {object} Iterable object
+ */
+export function tail( iter )
+{
+    if( !iter )
+        throw new Error('Iterable is not defined!');
+
+    const tmp = iter[Symbol.iterator]()
+    ,     val = tmp.next()
+    ;
+    if( val.done )
+        throw new Error( 'Iterable is empty' );
+
+    return { 
+        [Symbol.iterator]: () => {
+            const i = iter[Symbol.iterator]();
+            i.next();
+            return { next: i.next };
+        }
+    };
+}
+
+/**
  * Non-lazy version of map, wich will always return an array, not an iterator.
  * Can be used, if the function has side effects and needs to be execured
  * immediately, e.g. do something with a set of dom nodes.
+ *
+ * @param {function} f - function to apply to every element
+ * @param {object} iter - Iterable object
+ * @return {array} containing f(a) for each element of iter
  */
-function forEach( f, iter )
+export function forEach( f, iter )
 {
     return [...map( f, iter )];
 }
 
-/*
+/**
  * Return an iterater over an iterable object, wich will apply `f` on the
  * element delivered from the original `iterable.next` on each `next` call.
+ *
+ * @param {function} f - function to apply to every element
+ * @param {object} iter - Iterable object
+ * @return {object} Iterable object with f(a) for each a in iter
  */
-function map( f, iter )
+export function map( f, iter )
 {
     return {
         [Symbol.iterator]: () => {
@@ -99,28 +133,32 @@ function map( f, iter )
                 next: (...args) => {
                     const v = tmp.next( ...args );
                     return v.done ? v 
-                                  : { value: f( v.value ), done: false }
+                                  : { value: f( v.value ), done: false };
                 }
             };
         }
     };
 }
 
-/*
+/**
  * Filter an iterable and return an iterable object.
  *
  * ATTENTION (could this be fixed?):
  * In case of infinite iterables, this can well lead to an endless recursion, if
  * the filter is false for every following element
+ *
+ * @param {function} f - a -> boolean
+ * @param {object} iter - Iterable object
+ * @return {object} Iterable object containing each a of iter where f(a) === true 
  */
-function filter( f, iter )
+export function filter( f, iter )
 {
     return {
         [Symbol.iterator]: () => {
             const tmp = iter[Symbol.iterator]();
             return { next: gen_next( tmp )};
         }
-    }
+    };
 
     function gen_next( iter )
     {
@@ -128,15 +166,23 @@ function filter( f, iter )
 
         function next(...args) {
             const v = iter.next( ...args );
-            return v.done 
-                    ? v : f( v.value ) 
-                    ? v : next( ...args )
+            return v.done ? v 
+                          : f( v.value ) ? v 
+                                         : next( ...args )
             ;
         }
     }
 }
 
-function foldL(f, acc, iter) 
+/**
+ * Reduce a list from the left
+ *
+ * @param {function} f - b -> a -> b
+ * @param {B} acc - element of type b
+ * @param {object} iter - Iterable object with elements of type a
+ * @return {B} Element of type B
+ */
+export function foldL( f, acc, iter )
 {
     const tmp = iter[Symbol.iterator]()
     ,     val = tmp.next()
@@ -147,7 +193,15 @@ function foldL(f, acc, iter)
         return foldL( f, f( acc, head( iter )), tail( iter )); 
 }
 
-function foldR( f, acc, iter ) 
+/**
+ * Reduce a list from the right
+ *
+ * @param {function} f - a -> b -> b
+ * @param {B} acc - element of type b
+ * @param {object} iter - Iterable object with elements of type a
+ * @return {B} Element of type B
+ */
+export function foldR( f, acc, iter ) 
 {
     const tmp = iter[Symbol.iterator]()
     ,     val = tmp.next()
