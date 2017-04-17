@@ -1,14 +1,11 @@
 var path = require('path');
 
 module.exports = {
-    entry: './index.js',
+    entry: './test/bundle.js',
     output: {
-        path: path.resolve(__dirname, 'bin'),
-        filename: 'functional.js',
-        library:  'functionaljs',
-        libraryTarget: 'var'
+        path: path.resolve( __dirname, 'bin' ),
+        filename: 'testBundle.js'
     },
-
     resolve: {
         modules: [
           path.resolve('./'),

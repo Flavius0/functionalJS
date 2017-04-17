@@ -1,4 +1,4 @@
-export * from './lib/iterable.js'
-export * from './lib/util.js'
+export * from 'lib/iterable'
+export * from 'lib/util'
 
 
