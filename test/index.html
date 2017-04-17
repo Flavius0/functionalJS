@@ -11,16 +11,6 @@
     <h2>filter</h2>
     <h2>foldL/foldR</h2>
 
-<script src="../src/main.js"></script>
-<script>
-    // Setup test environment
-    const a = range( 1, 10 )
-    ,     b = map(t => t*10, filter(t => t %2 === 0, a))
-    ,     c = tail( b )
-    ;
-    console.log([...c])
-    console.log(foldL((x,y) => x+y, 0, c))
-    console.log(foldR((y,x) => x+y, 0, c))
-</script>
+<script src="../bin/functional.js"></script>
 </body>
 </html>

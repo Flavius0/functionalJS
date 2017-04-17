@@ -1,6 +1,34 @@
-{ "jshintConfig" : { "undef"     : true
-                   , "unused"    : true
-                   , "esversion" : 6
-                   , "laxcomma"  : true
-                   }
+{
+  "name": "functionaljs",
+  "description": "functional javascript based on es6",
+  "version": "0.0.1",
+  "bugs": {
+    "url": "https://github.com/Flavius0/functionalJS/issues"
+  },
+  "license": "GPL-3.0",
+  "author": "Fabian Brosda <f.brosda@gmx.de>",
+  "jshintConfig": {
+    "undef": true,
+    "unused": true,
+    "esversion": 6,
+    "laxcomma": true
+  },
+  "main": "bin/functional.js",
+  "module": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "webpack": "^2.4.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "webpack",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Flavius0/functionalJS.git"
+  },
+  "homepage": "https://github.com/Flavius0/functionalJS#readme"
 }
