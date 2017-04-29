@@ -5,7 +5,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'bin'),
         filename: 'functional.js',
-        library:  'functionaljs',
+        library:  'fjs',
         libraryTarget: 'var'
     },
 

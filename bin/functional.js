@@ -1,4 +1,4 @@
-var functionaljs =
+var fjs =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -64,7 +64,7 @@ var functionaljs =
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -252,6 +252,66 @@ function foldR( f, acc, iter )
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Monad; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Maybe; });
+
+
+/*
+ * A Monad Constructor
+ */
+function Monad( o, unit, bind )
+{
+    o.prototype.u = unit;
+    o.prototype.b = bind;
+    o.prototype.l = lift;
+
+    function lift( f )
+    {
+        return new o().u( f( this.value ));
+    }
+}
+
+/*
+ * Some monad definitions
+ */
+
+function Maybe( a ) {
+    this.value = this.u( a ).value;
+}
+
+function maybe_unit( a )
+{
+    if( a !== null && typeof a !== 'undefined' ) {
+        this.value = a
+    } else {
+        this.value = null;
+    }
+    return this;
+}
+
+function maybe_bind( f )
+{
+    if( this.value ) {
+        return f( this.value );
+    } else {
+        return this;
+    }
+}
+
+Monad(Maybe, maybe_unit, maybe_bind);
+
+//var a = new Maybe(3);
+//var b = new Maybe(2);
+//var c = a.l(x => x*3).b(x => b.l(y => y * 4).l( y =>  x + y ))
+//
+//console.log(a,b,c);
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return compose; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return bindF; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return range; });
@@ -327,7 +387,7 @@ function range( first = 0, last = Infinity, step = 1 )
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -340,10 +400,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "filter", function() { return __WEBPACK_IMPORTED_MODULE_0_lib_iterable__["e"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "foldL", function() { return __WEBPACK_IMPORTED_MODULE_0_lib_iterable__["f"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "foldR", function() { return __WEBPACK_IMPORTED_MODULE_0_lib_iterable__["g"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lib_util__ = __webpack_require__(1);
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "o", function() { return __WEBPACK_IMPORTED_MODULE_1_lib_util__["a"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "bindF", function() { return __WEBPACK_IMPORTED_MODULE_1_lib_util__["b"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "range", function() { return __WEBPACK_IMPORTED_MODULE_1_lib_util__["c"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lib_monad__ = __webpack_require__(1);
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Monad", function() { return __WEBPACK_IMPORTED_MODULE_1_lib_monad__["a"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Maybe", function() { return __WEBPACK_IMPORTED_MODULE_1_lib_monad__["b"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_lib_util__ = __webpack_require__(2);
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "o", function() { return __WEBPACK_IMPORTED_MODULE_2_lib_util__["a"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "bindF", function() { return __WEBPACK_IMPORTED_MODULE_2_lib_util__["b"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "range", function() { return __WEBPACK_IMPORTED_MODULE_2_lib_util__["c"]; });
+
 
 
 
