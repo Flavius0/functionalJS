@@ -259,52 +259,91 @@ function foldR( f, acc, iter )
 /*
  * A Monad Constructor
  */
-function Monad( o, unit, bind )
+function Monad( o, bind )
 {
-    o.prototype.u = unit;
+    o.u = unit;
     o.prototype.b = bind;
     o.prototype.l = lift;
+    o.prototype.j = join;
+
+    function join()
+    {
+        return this.__value;
+    }
 
     function lift( f )
     {
-        return new o().u( f( this.value ));
+        return o.u( f( this.__value ));
+    }
+
+    function unit( v )
+    {
+        return new o( v );
     }
 }
 
 /*
  * Some monad definitions
  */
+Monad( Maybe, maybe_bind );
 
-function Maybe( a ) {
-    this.value = this.u( a ).value;
-}
-
-function maybe_unit( a )
+function Maybe( v ) 
 {
-    if( a !== null && typeof a !== 'undefined' ) {
-        this.value = a
+    if( v === null || typeof v === 'undefined' ) {
+        this.__value = null;
     } else {
-        this.value = null;
+        this.__value = v
     }
     return this;
 }
 
 function maybe_bind( f )
 {
-    if( this.value ) {
-        return f( this.value );
+    if( this.__value ) {
+        return f( this.__value );
     } else {
         return this;
     }
 }
 
-Monad(Maybe, maybe_unit, maybe_bind);
+/*
+ * Writer Monad
+ */
 
-//var a = new Maybe(3);
-//var b = new Maybe(2);
-//var c = a.l(x => x*3).b(x => b.l(y => y * 4).l( y =>  x + y ))
-//
-//console.log(a,b,c);
+Monad( Writer, writer_bind );
+
+function Writer( v )
+{
+    this.__value = v;
+    this.__log = '';
+    return this;
+}
+
+function writer_bind( f )
+{
+    const ret = f( this.__value );
+    ret.__log = `${ret.__log} ${this.__log}`;
+    return ret;
+}
+
+const double = x => 2*x
+,     doubleW = x => {
+    const ret = Writer.u(x).l( double );
+    ret.__log = `<*2> ${x}`;
+    return ret;
+}
+,     addOne = x => x+1
+,     addOneW = x => {
+    const ret = Writer.u(x).l( addOne );
+    ret.__log = `<+1> ${x}`;
+    return ret;
+}
+,     val = 2
+,     w = Writer.u(2);
+;
+console.log( w.b( addOneW ).b( doubleW ).b( addOneW ));
+
+
 
 
 /***/ }),
