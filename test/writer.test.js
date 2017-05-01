@@ -6,11 +6,11 @@ export function writer_test() {
         describe('simple', function() {
             it('should track state in a second variable', function() {
                 const val = 2
-                ,     w = Writer.u(2)
-                ,     res = w.b( addOneW ).b( doubleW ).b( addOneW )
+                ,     w = Writer.return(2)
+                ,     res = w.bindM( addOneW ).bindM( doubleW ).bindM( addOneW )
                 ;
-                assert.equal( res.j(), 7 );
-                assert.equal( res.__log, ' <+1> 6 <*2> 3 <+1> 2' )
+                assert.equal( res.__log.join(' '), '2 <+1> 3 <*2> 6 <+1>' )
+                assert.equal( res.__value, 7 );
             });
         });
     });
@@ -24,14 +24,15 @@ export function writer_test() {
     }
     function addOneW( x )
     {
-        const ret = Writer.u(x).l( addOne );
-        ret.__log = ` <+1> ${x}`;
+        const m_f = Writer.lift( addOne );
+        const ret = m_f( Writer.return(x) );
+        ret.__log = [`${x} <+1>`];
         return ret;
     }
     function doubleW( x ) 
     {
-        const ret = Writer.u(x).l( double );
-        ret.__log = ` <*2> ${x}`;
+        const ret = Writer.return( double( x ));
+        ret.__log = [`${x} <*2>`];
         return ret;
     }
 }
