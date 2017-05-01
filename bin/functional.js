@@ -254,17 +254,26 @@ function foldR( f, acc, iter )
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Monad; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Maybe; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return Writer; });
 
 
 /*
  * A Monad Constructor
  */
-function Monad( o, bind )
+function Monad( o, bind, fail )
 {
     o.u = unit;
     o.prototype.b = bind;
     o.prototype.l = lift;
-    o.prototype.j = join;
+    //o.prototype.l2 = lift2;
+    o.prototype.tR = takeRight;
+    //o.prototype.j = join;  // Should only be used if fmap instead of bind would be defined?
+    o.prototype.f = fail || default_fail;
+
+    function default_fail( s )
+    {
+        throw new Error( s );
+    }
 
     function join()
     {
@@ -273,7 +282,21 @@ function Monad( o, bind )
 
     function lift( f )
     {
-        return o.u( f( this.__value ));
+        return o.u( this.b( f ));
+    }
+
+    function lift2( f, m_b )
+    {
+        return o.u( this.b( x => 
+            m_b.b( y => 
+                f( x, y )
+            )
+        ));
+    }
+
+    function takeRight( m_b )
+    {
+        return this.b( x => m_b );
     }
 
     function unit( v )
@@ -282,10 +305,25 @@ function Monad( o, bind )
     }
 }
 
+Monad.do = function( f, ...args )
+{
+    return do_helper( x => f( ...x ), args );
+
+    function do_helper( g, args )
+    {
+        if( args.length === 0 ) {
+            return g( [] );
+        } else {
+            const arg = args.shift();
+            return do_helper( v => arg.b( x => g( v.concat( x ))), args );
+        }
+    }
+};
+
 /*
  * Some monad definitions
  */
-Monad( Maybe, maybe_bind );
+Monad( Maybe, maybe_bind, maybe_fail );
 
 function Maybe( v ) 
 {
@@ -306,6 +344,11 @@ function maybe_bind( f )
     }
 }
 
+function maybe_fail()
+{
+    return new Maybe( null );
+}
+
 /*
  * Writer Monad
  */
@@ -322,26 +365,18 @@ function Writer( v )
 function writer_bind( f )
 {
     const ret = f( this.__value );
-    ret.__log = `${ret.__log} ${this.__log}`;
+    ret.__log = `${ret.__log}{this.__log}`;
     return ret;
 }
 
-const double = x => 2*x
-,     doubleW = x => {
-    const ret = Writer.u(x).l( double );
-    ret.__log = `<*2> ${x}`;
-    return ret;
-}
-,     addOne = x => x+1
-,     addOneW = x => {
-    const ret = Writer.u(x).l( addOne );
-    ret.__log = `<+1> ${x}`;
-    return ret;
-}
-,     val = 2
-,     w = Writer.u(2);
+const a = Maybe.u(2)
+,     b = Maybe.u(null)
+,     c = Maybe.u(1)
+,     f = (x,y,z) => Maybe.u( x - ( y - z ))
+,     g = x => Maybe.u( x + 1 )
 ;
-console.log( w.b( addOneW ).b( doubleW ).b( addOneW ));
+console.log( Monad.do( g, a ));
+console.log( Monad.do(f, a, b, c ));
 
 
 
@@ -442,6 +477,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lib_monad__ = __webpack_require__(1);
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Monad", function() { return __WEBPACK_IMPORTED_MODULE_1_lib_monad__["a"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Maybe", function() { return __WEBPACK_IMPORTED_MODULE_1_lib_monad__["b"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Writer", function() { return __WEBPACK_IMPORTED_MODULE_1_lib_monad__["c"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_lib_util__ = __webpack_require__(2);
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "o", function() { return __WEBPACK_IMPORTED_MODULE_2_lib_util__["a"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "bindF", function() { return __WEBPACK_IMPORTED_MODULE_2_lib_util__["b"]; });
